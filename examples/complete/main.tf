@@ -13,9 +13,16 @@
 data "azurerm_client_config" "client" {}
 
 data "azuread_service_principal" "client" {
+  count = var.use_service_principal ? 1 : 0
+
   object_id = data.azurerm_client_config.client.object_id
 }
 
+data "azuread_user" "client" {
+  count = var.use_service_principal ? 0 : 1
+
+  object_id = data.azurerm_client_config.client.object_id
+}
 
 module "resource_names" {
   source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
@@ -81,6 +88,6 @@ module "postgresql_server_ad_administrator" {
   tenant_id = data.azurerm_client_config.client.tenant_id
   object_id = data.azurerm_client_config.client.object_id
 
-  principal_name = data.azuread_service_principal.client.display_name
-  principal_type = "ServicePrincipal"
+  principal_name = var.use_service_principal ? data.azuread_service_principal.client[0].display_name : data.azuread_user.client[0].user_principal_name
+  principal_type = var.use_service_principal ? "ServicePrincipal" : "User"
 }

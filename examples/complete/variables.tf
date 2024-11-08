@@ -101,6 +101,12 @@ variable "location" {
   default     = "eastus"
 }
 
+variable "use_service_principal" {
+  description = "Set to false when running locally without a service principal"
+  type        = bool
+  default     = true
+}
+
 variable "public_network_access_enabled" {
   description = "Whether or not public network access is allowed for this server"
   type        = bool
